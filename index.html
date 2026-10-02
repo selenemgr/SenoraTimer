@@ -6,9 +6,9 @@
 <title>Senora Grand</title>
 <style>
   :root {
-    --bg: #050805;
-    --panel: #0d130d;
-    --line: #1f2e1f;
+    --bg: #0b1120;
+    --panel: #131c33;
+    --line: #26324f;
     --green: #22e06b;
     --green-dark: #138a40;
     --white: #f4f7f4;
@@ -22,7 +22,7 @@
   header {
     padding: 22px 16px 14px; text-align: center;
     border-bottom: 3px solid var(--green);
-    background: linear-gradient(180deg, #0a140a, var(--bg));
+    background: #0f1730;
   }
   header h1 {
     margin: 0; font-size: clamp(1.8rem, 6vw, 3rem); letter-spacing: .15em;
@@ -36,7 +36,7 @@
   }
   .controls label { color: var(--muted); font-size: .9rem; }
   input[type=number] {
-    width: 80px; padding: 9px; background: #000; color: var(--white);
+    width: 80px; padding: 9px; background: #0f1730; color: var(--white);
     border: 1px solid var(--line); border-radius: 6px; font-size: 1rem; text-align: center;
   }
   button {
@@ -93,7 +93,7 @@
 
   .tpop {
     display: none; position: absolute; left: -8px; bottom: calc(100% + 22px); width: min(380px, 88vw); padding: 18px 20px; z-index: 20;
-    background: #000; border: 2px solid var(--c, var(--green)); border-radius: 12px; box-shadow: 0 10px 34px #000;
+    background: #0f1730; border: 2px solid var(--c, var(--green)); border-radius: 12px; box-shadow: 0 10px 34px #000;
     font-family: Consolas, monospace; font-size: 1.05rem; text-align: left;
   }
   .tpop::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 26px; }
@@ -118,7 +118,7 @@
   .cp .cur:hover:not(:disabled) { background: var(--c, var(--green)); transform: scale(1.12); }
   .pop {
     display: none; position: absolute; right: 0; top: 36px; width: 196px; padding: 10px;
-    background: #000; border: 1px solid var(--green); border-radius: 8px; box-shadow: 0 6px 20px #000;
+    background: #0f1730; border: 1px solid var(--green); border-radius: 8px; box-shadow: 0 6px 20px #000;
   }
   .cp.open .pop { display: block; }
   .sw { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
@@ -128,7 +128,7 @@
   .hexrow { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
   .hexrow .pen { padding: 3px 8px; font-size: 1rem; text-transform: none; }
   .hexrow input.hex {
-    display: none; flex: 1; min-width: 0; width: 100%; padding: 5px; background: #0d130d; color: var(--white);
+    display: none; flex: 1; min-width: 0; width: 100%; padding: 5px; background: #0b1120; color: var(--white);
     border: 1px solid var(--line); border-radius: 4px; font-family: Consolas, monospace; font-size: .9rem; text-transform: uppercase;
   }
   .hexrow input.hex.bad { border-color: #fff; outline: 1px solid #fff; }

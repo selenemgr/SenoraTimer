@@ -172,6 +172,7 @@
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 6px 10px; }
     body { display: flex; flex-direction: column; min-height: 100dvh; }
     .grid { flex: 1; width: 100%; grid-auto-rows: minmax(min-content, 1fr); }
+    .grid[data-n="1"], .grid[data-n="2"] { grid-template-columns: minmax(0, 1fr); }
     .card { padding: 6px; border-left-width: 3px; min-width: 0; display: flex; flex-direction: column; }
     .card .time { flex: 0 0 auto; }
     .btns, .btns2 { flex: 1 1 0; }
@@ -284,6 +285,7 @@ function crear() {
   const colores = corredores.map(c => c.color);
   corredores = [];
   grid.innerHTML = '';
+  grid.dataset.n = n;
   llegada = 0;
   for (let i = 0; i < n; i++) {
     const c = { nombre: nombres[i] || 'Corredor ' + (i + 1), color: colores[i] || PALETA[i % PALETA.length], vueltas: [], pen: 0, marca: 0, final: null, terminado: false, pausado: false, pausaEn: 0, off: 0 };

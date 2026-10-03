@@ -136,6 +136,7 @@
   .hexrow label { font-size: .75rem; color: var(--muted); }
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
 
+  .sh { display: none; }
   @media (max-width: 600px) {
     header { padding: 6px 8px; border-bottom-width: 2px; }
     header h1 { font-size: 1.2rem; }
@@ -155,7 +156,9 @@
     .cp .cur { width: 20px; height: 20px; }
     .pop { top: 26px; width: 180px; }
     .time { font-size: 1.35rem; margin: 4px 0; }
-    .stats, .laps, .penbadge { display: none; }
+    .laps, .penbadge { display: none; }
+    .sh { display: inline; }
+    .stats { font-size: .7rem; margin: 0 0 2px; }
     .lbl { display: none; }
     .btns, .btns2 { gap: 4px; margin-top: 4px; }
     .btns button, .btns2 > button, .btns2 .tm > button { padding: 6px 2px; font-size: 1rem; line-height: 1; }
@@ -266,8 +269,8 @@ function crear() {
       <div class="time">00:00.000</div>
       <div class="penbadge"></div>
       <div class="stats">
-        <span>Última vuelta: <b class="nv">0</b></span>
-        <span>Tiempo: <b class="ul">--</b></span>
+        <span><span class="lbl">Última vuelta: </span><span class="sh">V</span><b class="nv">0</b></span>
+        <span><span class="lbl">Tiempo: </span><b class="ul">--</b></span>
       </div>
       <div class="btns">
         <button class="vuelta" title="Vuelta" disabled>⏱ <span class="lbl">Vuelta</span></button>

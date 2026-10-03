@@ -151,7 +151,8 @@
   .card.dq .time { color: #ff0000; text-decoration: line-through; }
   .card.dq .pos { background: #ff0000; color: #fff; }
   .card.dq .dqbadge { display: block; }
-  .card.paused .dqbadge { display: block; color: var(--white); }
+  .pico { display: none; font-size: 1rem; line-height: 1; }
+  .card.paused .pico { display: block; }
   .card.paused .time { opacity: .55; }
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
 
@@ -299,6 +300,7 @@ function crear() {
             <div class="hexrow"><button class="pen" title="Código hex">✏️</button><input class="hex" maxlength="7" placeholder="#22E06B"></div>
           </div>
         </div>
+        <span class="pico" title="Parado">⏸</span>
         <div class="mn">
           <button class="dots" title="Más opciones">⋮</button>
           <div class="mpop">
@@ -405,18 +407,15 @@ function tiempo(c) {
 
 function alternarPausa(c) {
   if (!corriendo || c.terminado) return;
-  const badge = c.el.querySelector('.dqbadge');
   if (!c.pausado) {
     c.pausaEn = tiempo(c);
     c.pausado = true;
     c.el.classList.add('paused');
-    badge.textContent = '⏸ Parado';
     c.el.querySelector('.time').textContent = fmt(c.pausaEn + c.pen);
   } else {
     c.off = performance.now() - t0 - c.pausaEn;
     c.pausado = false;
     c.el.classList.remove('paused');
-    badge.textContent = '';
   }
   actualizarBotones();
 }

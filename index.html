@@ -161,7 +161,7 @@
     .stats { font-size: .7rem; margin: 0 0 2px; }
     .lbl { display: none; }
     .btns, .btns2 { gap: 4px; margin-top: 4px; }
-    .btns button, .btns2 > button, .btns2 .tm > button { padding: 6px 2px; font-size: 1rem; line-height: 1; }
+    .btns button, .btns2 > button, .btns2 .tm > button { padding: 0; min-height: 44px; font-size: 1.4rem; line-height: 1; }
     .tpop { position: fixed; left: 8px; right: 8px; bottom: 8px; width: auto; top: auto; }
     .tpop.flip { left: 8px; right: 8px; }
     .tpop::after { display: none; }
@@ -269,7 +269,7 @@ function crear() {
       <div class="time">00:00.000</div>
       <div class="penbadge"></div>
       <div class="stats">
-        <span><span class="lbl">Última vuelta: </span><span class="sh">V</span><b class="nv">0</b></span>
+        <span><span class="lbl">Última vuelta: </span><span class="sh">Vuelta: </span><b class="nv">0</b></span>
         <span><span class="lbl">Tiempo: </span><b class="ul">--</b></span>
       </div>
       <div class="btns">

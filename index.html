@@ -144,8 +144,10 @@
     .controls label { display: none; }
     input[type=number] { width: 48px; padding: 5px; font-size: .85rem; }
     .controls button { padding: 6px 8px; font-size: .7rem; letter-spacing: 0; }
-    .grid { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 4px 6px 10px; }
-    .card { padding: 6px; border-left-width: 3px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 6px 10px; }
+    .card { padding: 6px; border-left-width: 3px; min-width: 0; }
+    .card input.name { width: 0; }
+    .controls button { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
     .card .top { gap: 4px; }
     .card .num { padding: 1px 5px; font-size: .75rem; }
     .card input.name { font-size: .8rem; padding: 1px; }

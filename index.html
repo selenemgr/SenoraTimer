@@ -134,6 +134,23 @@
   .hexrow input.hex.bad { border-color: #fff; outline: 1px solid #fff; }
   .cp.edit .hexrow input.hex { display: block; }
   .hexrow label { font-size: .75rem; color: var(--muted); }
+  button.danger { border-color: #ff0000; color: #ff0000; }
+  button.danger:hover:not(:disabled) { background: #ff0000; color: #fff; }
+  .mn { position: relative; }
+  .mn .dots { width: 24px; height: 28px; padding: 0; border: none; color: var(--white); font-size: 1.3rem; line-height: 1; }
+  .mn .dots:hover:not(:disabled) { background: var(--line); color: var(--white); }
+  .mpop {
+    display: none; position: absolute; right: 0; top: 32px; z-index: 25; width: 170px; padding: 8px;
+    flex-direction: column; gap: 6px;
+    background: #0f1730; border: 1px solid var(--green); border-radius: 8px; box-shadow: 0 6px 20px #000;
+  }
+  .mn.open .mpop { display: flex; }
+  .mpop button { padding: 9px 8px; font-size: .8rem; text-align: left; }
+  .dqbadge { display: none; text-align: center; font-size: .8rem; font-weight: 700; color: #ff0000; margin-bottom: 6px; }
+  .card.dq { border-left-color: #ff0000; }
+  .card.dq .time { color: #ff0000; text-decoration: line-through; }
+  .card.dq .pos { background: #ff0000; color: #fff; }
+  .card.dq .dqbadge { display: block; }
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
 
   .sh { display: none; }
@@ -144,7 +161,11 @@
     .controls { flex-wrap: nowrap; gap: 6px; padding: 6px 8px; }
     .controls label { display: none; }
     input[type=number] { width: 48px; padding: 5px; font-size: .85rem; }
-    .controls button { padding: 6px 8px; font-size: .7rem; letter-spacing: 0; }
+    .controls button { padding: 6px 4px; font-size: .68rem; letter-spacing: 0; }
+    .mn .dots { width: 18px; height: 22px; font-size: 1.1rem; }
+    .mpop { top: 26px; width: 150px; }
+    .mpop button { font-size: .75rem; }
+    .dqbadge { font-size: .7rem; margin-bottom: 2px; }
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 6px 10px; }
     body { display: flex; flex-direction: column; min-height: 100dvh; }
     .grid { flex: 1; width: 100%; grid-auto-rows: minmax(min-content, 1fr); }
@@ -186,6 +207,7 @@
   <input type="number" id="cant" min="1" max="20" value="3">
   <button id="aplicar" class="white">Aplicar</button>
   <button id="iniciar" class="primary">Iniciar todos</button>
+  <button id="parar" class="danger" disabled>Parar todos</button>
   <button id="reiniciar">Reiniciar</button>
 </div>
 
@@ -247,6 +269,11 @@ function iniciarColor(c, el) {
 }
 document.addEventListener('click', () => document.querySelectorAll('.cp.open').forEach(x => { x.classList.remove('open'); x.closest('.card').classList.remove('open'); }));
 
+function cerrarMenus() {
+  document.querySelectorAll('.mn.open').forEach(x => { x.classList.remove('open'); x.closest('.card').classList.remove('open'); });
+}
+document.addEventListener('click', cerrarMenus);
+
 function crear() {
   const n = Math.max(1, Math.min(20, parseInt($('cant').value) || 1));
   $('cant').value = n;
@@ -270,8 +297,16 @@ function crear() {
             <div class="hexrow"><button class="pen" title="Código hex">✏️</button><input class="hex" maxlength="7" placeholder="#22E06B"></div>
           </div>
         </div>
+        <div class="mn">
+          <button class="dots" title="Más opciones">⋮</button>
+          <div class="mpop">
+            <button class="white parar1" disabled>⏹ Parar</button>
+            <button class="danger desc" disabled>✕ Descalificar</button>
+          </div>
+        </div>
         <span class="pos"></span></div>
       <div class="time">00:00.000</div>
+      <div class="dqbadge"></div>
       <div class="penbadge"></div>
       <div class="stats">
         <span><span class="lbl">Última vuelta: </span><span class="sh">Vuelta: </span><b class="nv">0</b></span>
@@ -295,6 +330,16 @@ function crear() {
     el.querySelector('.vuelta').onclick = () => vuelta(c);
     el.querySelector('.terminar').onclick = () => terminar(c);
     el.querySelector('.penal').onclick = () => penalizar(c);
+    const mn = el.querySelector('.mn');
+    el.querySelector('.dots').onclick = e => {
+      e.stopPropagation();
+      document.querySelectorAll('.mn.open').forEach(x => { if (x !== mn) { x.classList.remove('open'); x.closest('.card').classList.remove('open'); } });
+      mn.classList.toggle('open');
+      el.classList.toggle('open', mn.classList.contains('open'));
+    };
+    mn.querySelector('.mpop').onclick = e => e.stopPropagation();
+    el.querySelector('.parar1').onclick = () => { cerrarMenus(); terminar(c); };
+    el.querySelector('.desc').onclick = () => { cerrarMenus(); terminar(c, true); };
     const tm = el.querySelector('.tm');
     const cerrarT = () => { tm.classList.remove('open'); el.classList.remove('open'); };
     el.querySelector('.vertodo').onclick = () => {
@@ -316,7 +361,10 @@ function actualizarBotones() {
   $('cant').disabled = corriendo;
   $('iniciar').disabled = corriendo || corredores.every(c => c.terminado) && corredores.length > 0 && t0 !== null;
   $('iniciar').disabled = corriendo || t0 !== null;
+  $('parar').disabled = !corriendo;
   corredores.forEach(c => {
+    c.el.querySelector('.parar1').disabled = !corriendo || c.terminado;
+    c.el.querySelector('.desc').disabled = !corriendo || c.terminado;
     c.el.querySelector('.vuelta').disabled = !corriendo || c.terminado;
     c.el.querySelector('.terminar').disabled = !corriendo || c.terminado;
     c.el.querySelector('.penal').disabled = t0 === null;
@@ -328,13 +376,14 @@ function pintarTiempos(c) {
   let h = c.vueltas.map((v, i) => `<li class="${i === c.vueltas.length - 1 ? 'best' : ''}"><span>Vuelta ${i + 1}</span><span>${fmt(v)}</span></li>`).reverse().join('');
   if (!c.vueltas.length) h = '<li><span>Sin vueltas aún</span></li>';
   if (c.pen) h += `<li class="pen"><span>Penalización</span><span>+${fmt(c.pen)}</span></li>`;
-  if (c.terminado) h += `<li class="tot"><span>Total</span><span>${fmt(c.final + c.pen)}</span></li>`;
+  if (c.dq) h += `<li class="pen"><span>✕ Descalificado</span><span>${fmt(c.final + c.pen)}</span></li>`;
+  else if (c.terminado) h += `<li class="tot"><span>Total</span><span>${fmt(c.final + c.pen)}</span></li>`;
   ol.innerHTML = h;
   c.el.querySelector('.penbadge').textContent = c.pen ? `Penalización: +${c.pen / 1000}s` : '';
 }
 
 function posiciones() {
-  corredores.filter(c => c.terminado).sort((a, b) => (a.final + a.pen) - (b.final + b.pen))
+  corredores.filter(c => c.terminado && !c.dq).sort((a, b) => (a.final + a.pen) - (b.final + b.pen))
     .forEach((c, i) => c.el.querySelector('.pos').textContent = 'P' + (i + 1));
 }
 
@@ -368,13 +417,19 @@ function vuelta(c) {
   pintarVueltas(c);
 }
 
-function terminar(c) {
+function terminar(c, dq = false) {
   if (!corriendo || c.terminado) return;
   const now = performance.now() - t0;
-  if (now - c.marca > 0) { c.vueltas.push(now - c.marca); c.marca = now; pintarVueltas(c); }
+  if (!dq && now - c.marca > 0) { c.vueltas.push(now - c.marca); c.marca = now; pintarVueltas(c); }
   c.terminado = true;
   c.final = now;
   c.el.classList.add('done');
+  if (dq) {
+    c.dq = true;
+    c.el.classList.add('dq');
+    c.el.querySelector('.pos').textContent = '✕';
+    c.el.querySelector('.dqbadge').textContent = '✕ Descalificado';
+  }
   c.el.querySelector('.time').textContent = fmt(now + c.pen);
   pintarTiempos(c);
   posiciones();
@@ -397,6 +452,8 @@ $('iniciar').onclick = () => {
   actualizarBotones();
   raf = requestAnimationFrame(bucle);
 };
+
+$('parar').onclick = () => corredores.forEach(c => terminar(c));
 
 $('reiniciar').onclick = () => {
   corriendo = false;

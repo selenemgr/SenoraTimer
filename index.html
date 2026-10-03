@@ -151,6 +151,8 @@
   .card.dq .time { color: #ff0000; text-decoration: line-through; }
   .card.dq .pos { background: #ff0000; color: #fff; }
   .card.dq .dqbadge { display: block; }
+  .card.paused .dqbadge { display: block; color: var(--white); }
+  .card.paused .time { opacity: .55; }
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
 
   .sh { display: none; }
@@ -283,7 +285,7 @@ function crear() {
   grid.innerHTML = '';
   llegada = 0;
   for (let i = 0; i < n; i++) {
-    const c = { nombre: nombres[i] || 'Corredor ' + (i + 1), color: colores[i] || PALETA[i % PALETA.length], vueltas: [], pen: 0, marca: 0, final: null, terminado: false };
+    const c = { nombre: nombres[i] || 'Corredor ' + (i + 1), color: colores[i] || PALETA[i % PALETA.length], vueltas: [], pen: 0, marca: 0, final: null, terminado: false, pausado: false, pausaEn: 0, off: 0 };
     corredores.push(c);
     const el = document.createElement('div');
     el.className = 'card';
@@ -300,7 +302,7 @@ function crear() {
         <div class="mn">
           <button class="dots" title="Más opciones">⋮</button>
           <div class="mpop">
-            <button class="white parar1" disabled>⏹ Parar</button>
+            <button class="white parar1" disabled>⏸ Parar</button>
             <button class="danger desc" disabled>✕ Descalificar</button>
           </div>
         </div>
@@ -321,7 +323,7 @@ function crear() {
           <button class="white vertodo" title="Ver tiempos">📋 <span class="lbl">Ver tiempos</span></button>
           <div class="tpop"><div class="tphead"><h4>Todos los tiempos</h4><button class="cerrar" title="Cerrar">✕</button></div><ol class="all"></ol></div>
         </div>
-        <button class="white penal" title="+10s penalización" disabled>⚠ <span class="lbl">+10s penalización</span></button>
+        <button class="white penal" title="+1s penalización" disabled>⚠ <span class="lbl">+1s penalización</span></button>
       </div>
       <ul class="laps"></ul>`;
     c.el = el;
@@ -338,7 +340,7 @@ function crear() {
       el.classList.toggle('open', mn.classList.contains('open'));
     };
     mn.querySelector('.mpop').onclick = e => e.stopPropagation();
-    el.querySelector('.parar1').onclick = () => { cerrarMenus(); terminar(c); };
+    el.querySelector('.parar1').onclick = () => { cerrarMenus(); alternarPausa(c); };
     el.querySelector('.desc').onclick = () => { cerrarMenus(); terminar(c, true); };
     const tm = el.querySelector('.tm');
     const cerrarT = () => { tm.classList.remove('open'); el.classList.remove('open'); };
@@ -363,10 +365,11 @@ function actualizarBotones() {
   $('iniciar').disabled = corriendo || t0 !== null;
   $('parar').disabled = !corriendo;
   corredores.forEach(c => {
-    c.el.querySelector('.parar1').disabled = !corriendo || c.terminado;
+    c.el.querySelector(".parar1").disabled = !corriendo || c.terminado;
+    c.el.querySelector(".parar1").textContent = c.pausado ? "▶ Continuar" : "⏸ Parar";
     c.el.querySelector('.desc').disabled = !corriendo || c.terminado;
-    c.el.querySelector('.vuelta').disabled = !corriendo || c.terminado;
-    c.el.querySelector('.terminar').disabled = !corriendo || c.terminado;
+    c.el.querySelector('.vuelta').disabled = !corriendo || c.terminado || c.pausado;
+    c.el.querySelector('.terminar').disabled = !corriendo || c.terminado || c.pausado;
     c.el.querySelector('.penal').disabled = t0 === null;
   });
 }
@@ -383,16 +386,39 @@ function pintarTiempos(c) {
 }
 
 function posiciones() {
-  corredores.filter(c => c.terminado && !c.dq).sort((a, b) => (a.final + a.pen) - (b.final + b.pen))
+  corredores.filter(c => c.terminado && !c.dq && !c.sinPos).sort((a, b) => (a.final + a.pen) - (b.final + b.pen))
     .forEach((c, i) => c.el.querySelector('.pos').textContent = 'P' + (i + 1));
 }
 
 function penalizar(c) {
   if (t0 === null) return;
-  c.pen += 10000;
+  c.pen += 1000;
   if (c.terminado) { c.el.querySelector('.time').textContent = fmt(c.final + c.pen); posiciones(); }
-  else c.el.querySelector('.time').textContent = fmt(performance.now() - t0 + c.pen);
+  else c.el.querySelector('.time').textContent = fmt(tiempo(c) + c.pen);
   pintarTiempos(c);
+}
+
+// tiempo del corredor descontando las pausas; congelado mientras está parado
+function tiempo(c) {
+  return c.pausado ? c.pausaEn : performance.now() - t0 - c.off;
+}
+
+function alternarPausa(c) {
+  if (!corriendo || c.terminado) return;
+  const badge = c.el.querySelector('.dqbadge');
+  if (!c.pausado) {
+    c.pausaEn = tiempo(c);
+    c.pausado = true;
+    c.el.classList.add('paused');
+    badge.textContent = '⏸ Parado';
+    c.el.querySelector('.time').textContent = fmt(c.pausaEn + c.pen);
+  } else {
+    c.off = performance.now() - t0 - c.pausaEn;
+    c.pausado = false;
+    c.el.classList.remove('paused');
+    badge.textContent = '';
+  }
+  actualizarBotones();
 }
 
 function pintarVueltas(c) {
@@ -410,20 +436,27 @@ function pintarVueltas(c) {
 }
 
 function vuelta(c) {
-  if (!corriendo || c.terminado) return;
-  const now = performance.now() - t0;
+  if (!corriendo || c.terminado || c.pausado) return;
+  const now = tiempo(c);
   c.vueltas.push(now - c.marca);
   c.marca = now;
   pintarVueltas(c);
 }
 
-function terminar(c, dq = false) {
+function terminar(c, dq = false, sinPos = false) {
   if (!corriendo || c.terminado) return;
-  const now = performance.now() - t0;
+  const now = tiempo(c);
   if (!dq && now - c.marca > 0) { c.vueltas.push(now - c.marca); c.marca = now; pintarVueltas(c); }
+  c.pausado = false;
+  c.el.classList.remove('paused');
+  c.el.querySelector('.dqbadge').textContent = '';
   c.terminado = true;
   c.final = now;
   c.el.classList.add('done');
+  if (sinPos) {
+    c.sinPos = true;
+    c.el.querySelector('.pos').textContent = '-';
+  }
   if (dq) {
     c.dq = true;
     c.el.classList.add('dq');
@@ -441,8 +474,7 @@ function terminar(c, dq = false) {
 }
 
 function bucle() {
-  const now = performance.now() - t0;
-  corredores.forEach(c => { if (!c.terminado) c.el.querySelector('.time').textContent = fmt(now + c.pen); });
+  corredores.forEach(c => { if (!c.terminado && !c.pausado) c.el.querySelector('.time').textContent = fmt(tiempo(c) + c.pen); });
   if (corriendo) raf = requestAnimationFrame(bucle);
 }
 
@@ -453,7 +485,7 @@ $('iniciar').onclick = () => {
   raf = requestAnimationFrame(bucle);
 };
 
-$('parar').onclick = () => corredores.forEach(c => terminar(c));
+$('parar').onclick = () => corredores.forEach(c => terminar(c, false, true));
 
 $('reiniciar').onclick = () => {
   corriendo = false;

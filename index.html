@@ -146,7 +146,12 @@
     input[type=number] { width: 48px; padding: 5px; font-size: .85rem; }
     .controls button { padding: 6px 8px; font-size: .7rem; letter-spacing: 0; }
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 4px 6px 10px; }
-    .card { padding: 6px; border-left-width: 3px; min-width: 0; }
+    body { display: flex; flex-direction: column; min-height: 100dvh; }
+    .grid { flex: 1; width: 100%; grid-auto-rows: minmax(min-content, 1fr); }
+    .card { padding: 6px; border-left-width: 3px; min-width: 0; display: flex; flex-direction: column; }
+    .card .time { flex: 0 0 auto; }
+    .btns, .btns2 { flex: 1 1 0; }
+    .btns2 .tm { display: flex; }
     .card input.name { width: 0; }
     .controls button { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
     .card .top { gap: 4px; }
@@ -155,13 +160,13 @@
     .card .pos { padding: 1px 5px; font-size: .75rem; }
     .cp .cur { width: 20px; height: 20px; }
     .pop { top: 26px; width: 180px; }
-    .time { font-size: 1.35rem; margin: 4px 0; }
+    .time { font-size: 1.6rem; margin: 6px 0 4px; }
     .laps, .penbadge { display: none; }
     .sh { display: inline; }
     .stats { font-size: .7rem; margin: 0 0 2px; }
     .lbl { display: none; }
     .btns, .btns2 { gap: 4px; margin-top: 4px; }
-    .btns button, .btns2 > button, .btns2 .tm > button { padding: 0; min-height: 44px; font-size: 1.4rem; line-height: 1; }
+    .btns button, .btns2 > button, .btns2 .tm > button { padding: 0; min-height: 44px; font-size: 1.8rem; line-height: 1; }
     .tpop { position: fixed; left: 8px; right: 8px; bottom: 8px; width: auto; top: auto; }
     .tpop.flip { left: 8px; right: 8px; }
     .tpop::after { display: none; }

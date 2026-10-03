@@ -135,6 +135,34 @@
   .cp.edit .hexrow input.hex { display: block; }
   .hexrow label { font-size: .75rem; color: var(--muted); }
   .empty { text-align: center; color: var(--muted); padding: 40px 16px; grid-column: 1 / -1; }
+
+  @media (max-width: 600px) {
+    header { padding: 6px 8px; border-bottom-width: 2px; }
+    header h1 { font-size: 1.2rem; }
+    header p { display: none; }
+    .controls { flex-wrap: nowrap; gap: 6px; padding: 6px 8px; }
+    .controls label { display: none; }
+    input[type=number] { width: 48px; padding: 5px; font-size: .85rem; }
+    .controls button { padding: 6px 8px; font-size: .7rem; letter-spacing: 0; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 4px 6px 10px; }
+    .card { padding: 6px; border-left-width: 3px; }
+    .card .top { gap: 4px; }
+    .card .num { padding: 1px 5px; font-size: .75rem; }
+    .card input.name { font-size: .8rem; padding: 1px; }
+    .card .pos { padding: 1px 5px; font-size: .75rem; }
+    .cp .cur { width: 20px; height: 20px; }
+    .pop { top: 26px; width: 180px; }
+    .time { font-size: 1.35rem; margin: 4px 0; }
+    .stats, .laps, .penbadge { display: none; }
+    .lbl { display: none; }
+    .btns, .btns2 { gap: 4px; margin-top: 4px; }
+    .btns button, .btns2 > button, .btns2 .tm > button { padding: 6px 2px; font-size: 1rem; line-height: 1; }
+    .tpop { position: fixed; left: 8px; right: 8px; bottom: 8px; width: auto; top: auto; }
+    .tpop.flip { left: 8px; right: 8px; }
+    .tpop::after { display: none; }
+    .card:nth-child(even) .pop { right: 0; }
+    .card:nth-child(odd) .pop { right: auto; left: 0; }
+  }
 </style>
 </head>
 <body>
@@ -240,15 +268,15 @@ function crear() {
         <span>Tiempo: <b class="ul">--</b></span>
       </div>
       <div class="btns">
-        <button class="vuelta" disabled>Vuelta</button>
-        <button class="white terminar" disabled>Terminar</button>
+        <button class="vuelta" title="Vuelta" disabled>⏱ <span class="lbl">Vuelta</span></button>
+        <button class="white terminar" title="Terminar" disabled>🏁 <span class="lbl">Terminar</span></button>
       </div>
       <div class="btns2">
         <div class="tm">
-          <button class="white vertodo">Ver tiempos</button>
+          <button class="white vertodo" title="Ver tiempos">📋 <span class="lbl">Ver tiempos</span></button>
           <div class="tpop"><div class="tphead"><h4>Todos los tiempos</h4><button class="cerrar" title="Cerrar">✕</button></div><ol class="all"></ol></div>
         </div>
-        <button class="white penal" disabled>+10s penalización</button>
+        <button class="white penal" title="+10s penalización" disabled>⚠ <span class="lbl">+10s penalización</span></button>
       </div>
       <ul class="laps"></ul>`;
     c.el = el;
